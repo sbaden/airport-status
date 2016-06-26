@@ -31,7 +31,7 @@ $(document).ready(function(){  //console.log('connected');
 				url: 'http://services.faa.gov/airport/status/' + $airport.val() + '?format=application/json',
 				type: 'GET',
 				success: function(response){
-					console.log('success');
+					passAirportData(response);
 				},
 				error: function(response){
 					console.log(response);
@@ -40,9 +40,44 @@ $(document).ready(function(){  //console.log('connected');
 		}
 
 		$airport.val('');
-	});
+
+	});  // End submitButton event listener/handler
     
-});
+});  // End (document).ready
+
+
+
+function passAirportData(data){
+	//console.log(data.ICAO);
+
+	var airport = {
+		icao: data.ICAO,
+		name: data.name,
+		city: data.city,
+		state: data.state,
+		weather: {
+			visibility: data.weather.visibility,
+			description: data.weather.weather,
+			temp: data.weather.temp,
+			wind: data.weather.wind,
+			updated: data.weather.updated,
+		},  // end weather Obj
+		delay: data.delay,
+		status: {
+			type: data.status.type,
+			reason: data.status.reason,
+			avgDelay: data.status.avgDelay,
+			minDelay: data.status.minDelay,
+			maxDelay: data.status.maxDelay,
+			endTime: data.status.endTime,
+			closureBegin: data.status.closureBegin,
+			closureEnd: data.status.closureEnd,
+			trend: data.status.trend,
+		}, // end status Obj
+	} // end airport Obj
+
+	// console.log(airport.icao.toUpperCase());
+}
 
 
 
