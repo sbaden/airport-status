@@ -1,10 +1,7 @@
 'use strict';  // Strict mode checks for undeclared variables (etc.?)
 
 $(document).ready(function(){  //console.log('connected');
-
-	///// Firebase
-	var myDBReference = new Firebase('https://airport-status.firebaseio.com/')
-
+	
 	// Initialize Firebase
 	var config = {
 		apiKey: "AIzaSyBbZHH2sVP6K3aZgR5xeQqz2PEw6RbLLTE",
@@ -14,8 +11,6 @@ $(document).ready(function(){  //console.log('connected');
 	};
 
 	firebase.initializeApp(config);
-	///// end Firebase
-
 
 	// Submit button
 	$('#get-airport-data').on('click', function(){
@@ -42,18 +37,26 @@ $(document).ready(function(){  //console.log('connected');
 		$airport.val('');
 
 	});  // End submitButton event listener/handler
-    
 });  // End (document).ready
 
 
 
 function passAirportData(data){
 	//console.log(data.ICAO);
+
+	///// Firebase
+	var myDBReference = new Firebase('https://airport-status.firebaseio.com/')
+
+
+	var airportsReference = myDBReference.child('Airports');
+	///// end Firebase
+
+
 	var templateSource = $('#airport-template').html();  // Reference html template
 	var template = Handlebars.compile(templateSource);  // Compile template w/Handlebars
 
 	var airport = {
-		icao: data.ICAO,
+		icao: data.ICAO.toUpperCase(),
 		name: data.name,
 		city: data.city,
 		state: data.state,
@@ -77,6 +80,11 @@ function passAirportData(data){
 
 	var readyTemplate = template(airport);  // Pass data Obj to template
 	$('body').append(readyTemplate);  // Append DOM
+
+	airportsReference.push({
+		airport: airport + airport.icao,
+	});
+
 }
 
 

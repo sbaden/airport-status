@@ -1,0 +1,60 @@
+body {
+	background-color: #FFF;
+}
+
+#userInput {
+	max-width: 690px;
+	margin-bottom: 30px;
+}
+
+/*#airport-search {
+	color: #c6c6c6;
+	border: 1px solid black;
+}*/
+
+img {
+	margin-bottom: 0px;
+}
+
+h1 {
+	margin-top: 0px;
+	margin-bottom: 0px;
+	font-weight: bold;
+	font-size: 20px;
+	font-family: sans-serif;
+	color: #E65100;
+}
+
+h2 {
+	margin-top: 0px;
+	margin-bottom: 0px;
+	font-weight: normal;
+	font-size: 15px;
+	font-family: sans-serif;
+}
+
+a {
+	font-weight: normal;
+	font-size: 15px;
+	font-family: sans-serif;
+	color: #fff;
+}
+
+hr {
+	margin-top: 30px;
+	margin-bottom: 10px;
+	margin-left: auto;
+	margin-right: auto;
+	border-width: 1px;
+	border-color: #E1F5FE;
+}
+
+div {
+	/*border-style: solid;
+	border-width: 2px;
+	border-color: red;*/
+}
+
+
+
+
