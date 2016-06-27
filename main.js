@@ -49,22 +49,21 @@ $(document).ready(function(){  //console.log('connected');
 
 function passAirportData(data){
 	//console.log(data.ICAO);
+	var templateSource = $('#airport-template').html();  // Reference html template
+	var template = Handlebars.compile(templateSource);  // Compile template w/Handlebars
 
 	var airport = {
 		icao: data.ICAO,
 		name: data.name,
 		city: data.city,
 		state: data.state,
-		weather: {
+		weather: data.weather.weather,
 			visibility: data.weather.visibility,
-			description: data.weather.weather,
 			temp: data.weather.temp,
 			wind: data.weather.wind,
-			updated: data.weather.updated,
-		},  // end weather Obj
+			updated: data.weather.meta.updated,
 		delay: data.delay,
-		status: {
-			type: data.status.type,
+		status: data.status.type,
 			reason: data.status.reason,
 			avgDelay: data.status.avgDelay,
 			minDelay: data.status.minDelay,
@@ -73,10 +72,11 @@ function passAirportData(data){
 			closureBegin: data.status.closureBegin,
 			closureEnd: data.status.closureEnd,
 			trend: data.status.trend,
-		}, // end status Obj
 	} // end airport Obj
-
 	// console.log(airport.icao.toUpperCase());
+
+	var readyTemplate = template(airport);  // Pass data Obj to template
+	$('body').append(readyTemplate);  // Append DOM
 }
 
 
