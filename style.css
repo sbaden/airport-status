@@ -7,6 +7,18 @@ body {
 	margin-bottom: 30px;
 }
 
+#airport-form {
+	float: left;
+}
+
+#get-saved-airports {
+	margin-left: 20px;
+}
+
+#airport-notes {
+	margin-left: 10px;
+}
+
 /*#airport-search {
 	color: #c6c6c6;
 	border: 1px solid black;

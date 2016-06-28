@@ -1,7 +1,7 @@
 'use strict';  // Strict mode checks for undeclared variables (etc.?)
 
-$(document).ready(function(){  //console.log('connected');
-	
+$(document).ready(function(){
+
 	// Initialize Firebase
 	var config = {
 		apiKey: "AIzaSyBbZHH2sVP6K3aZgR5xeQqz2PEw6RbLLTE",
@@ -12,16 +12,72 @@ $(document).ready(function(){  //console.log('connected');
 
 	firebase.initializeApp(config);
 
+
+	// Get a database reference to airports
+	var myDBReference = new Firebase('https://airport-status.firebaseio.com/')
+	var airportsReference = myDBReference.child('airports');
+
+
+	// Read Functionality
+	var ref = new Firebase('https://airport-status.firebaseio.com/airports/');
+	ref.orderByKey().on("child_added", function(results) {
+		console.log(results.key());
+		console.log(results.val().data.name);
+
+		var data = {
+			icao: results.val().data.icao,
+			name: results.val().data.name, // API specific gives us our message, we know this b/c we logged it above
+			city: results.val().data.city,
+			state: results.val().data.state,
+			weather: results.val().data.weather,
+				visibility: results.val().data.visibility,
+				temp: results.val().data.temp,
+				wind: results.val().data.wind,
+				updated: results.val().data.updated,
+			delay: results.val().data.delay,
+			status: results.val().data.status,
+				reason: results.val().data.reason,
+				avgDelay: results.val().data.avgDelay,
+				minDelay: results.val().data.minDelay,
+				maxDelay: results.val().data.maxDelay,
+				endTime: results.val().data.endTime,
+				closureBegin: results.val().data.closureBegin,
+				closureEnd: results.val().data.closureEnd,
+				trend: results.val().data.trend,
+			notes: results.val().data.notes,
+			id: results.key(), // Gets the key of the location that generated the DataSnapshot "results"
+		}
+		
+		var templateSource = $('#airport-template').html();  // Reference html template
+		var template = Handlebars.compile(templateSource);  // Compile template w/Handlebars
+
+		var templateHTML = template(data); // render the data
+		var $templateHTML = $(templateHTML);
+
+		$templateHTML.click(function() {
+			var airportId = $(this).data('id');
+			// updateMessage(airportId);
+		});
+
+		$('#favorites-form').submit(function(){
+			event.preventDefault();
+			console.log(data);	
+			$('#airport-list').append($templateHTML); // adds data to list dynamically
+		});
+	});
+
+
+
 	// Submit button
-	$('#get-airport-data').on('click', function(){
+	$('#airport-form').submit(function(event){
+		event.preventDefault();
+		console.log('submited');
 		var $airport = $('#airport-search');
-		//console.log($airport.val().length);
 
 		if(!$airport.val().trim() || $airport.val().length > 3){
 			alert('Please enter a valid airport 3 letter identifier');
 		}
-		else{  //console.log($airport.val());
-
+		else{
 			$.ajax({
 				url: 'http://services.faa.gov/airport/status/' + $airport.val() + '?format=application/json',
 				type: 'GET',
@@ -37,19 +93,31 @@ $(document).ready(function(){  //console.log('connected');
 		$airport.val('');
 
 	});  // End submitButton event listener/handler
+
+	// Update Functionality
+	/*$(document).on("click", "#update", function(){
+		var $airportNotes = $('#airport-notes');
+		// console.log($airportNotes.val());
+
+		var ref = new Firebase('https://airport-status.firebaseio.com/airports/');
+		console.log(ref.child(data.icao));
+		console.log(results.key());
+		$airportNotes.val('');
+	});*/
+
+
+	//console.log(airportsReference.key());
+
+
 });  // End (document).ready
 
 
 
 function passAirportData(data){
-	//console.log(data.ICAO);
 
 	///// Firebase
 	var myDBReference = new Firebase('https://airport-status.firebaseio.com/')
-
-
-	var airportsReference = myDBReference.child('Airports');
-	///// end Firebase
+	var airportsReference = myDBReference.child('airports');
 
 
 	var templateSource = $('#airport-template').html();  // Reference html template
@@ -75,18 +143,38 @@ function passAirportData(data){
 			closureBegin: data.status.closureBegin,
 			closureEnd: data.status.closureEnd,
 			trend: data.status.trend,
+		// notes: data.notes,
 	} // end airport Obj
-	// console.log(airport.icao.toUpperCase());
 
 	var readyTemplate = template(airport);  // Pass data Obj to template
 	$('body').append(readyTemplate);  // Append DOM
 
-	airportsReference.push({
-		airport: airport + airport.icao,
+
+	if(airportsReference.child(airport.icao)){
+		airportsReference.child(airport.icao).update({
+			data: airport,
+		});
+	}
+	else{
+		airportsReference.child(airport.icao).set({
+			data: airport,
+		});
+	}
+
+	$(document).on("click", "#update", function(){
+		var $airportNotes = $('#airport-notes');
+		// console.log($airportNotes.val());
+
+		var id = airport.icao;
+		var airportRef = new Firebase('https://airport-status.firebaseio.com/airports/' + id + '/data/');
+
+		console.log($airportNotes.val());
+		airportRef.update({
+			notes: $airportNotes.val(),
+		});
 	});
 
 }
-
 
 
 

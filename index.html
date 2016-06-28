@@ -18,8 +18,13 @@
 	<body>
 
 		<div id="userInput">
-			<input id="airport-search" type="text">
-			<input id="get-airport-data" type="button" value="Get Airport Status">
+			<form id="airport-form">
+				<input id="airport-search" type="text">
+				<button id="get-airport-data">Get Airport Status</button>
+			</form>
+			<form id="favorites-form">
+				<button id="get-saved-airports">Favorites</button>
+			</form>
 		</div>
 
 		<script id="airport-template" type="text/x-handlebars-template">
@@ -44,11 +49,17 @@
 				<h2>Closure Begin: {{closureBegin}}</h2>
 				<h2>Closure End: {{closureEnd}}</h2>
 				<h2>Trend: {{trend}}</h2>
-				<a id="link" href="http://www.imdb.com/title/{{imdb}}">IMDB</a>
+				<h2>Notes: {{notes}}</h2>
+				<br>
+				<h2>Add Notes<input id="airport-notes" type="text"></input><button id="update">Update</button></h2>
 				
 			</div>
 			<hr>
 		</script>
+
+		<div id="data-wrapper">
+			<ol id="airport-list"></ol>
+		</div>
 	</body>
 </html>
 
