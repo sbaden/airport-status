@@ -47,7 +47,7 @@ $(document).ready(function(){
 			notes: results.val().data.notes,
 			id: results.key(), // Gets the key of the location that generated the DataSnapshot "results"
 		}
-		
+		console.log(data.notes);
 		var templateSource = $('#airport-template').html();  // Reference html template
 		var template = Handlebars.compile(templateSource);  // Compile template w/Handlebars
 
@@ -94,21 +94,6 @@ $(document).ready(function(){
 
 	});  // End submitButton event listener/handler
 
-	// Update Functionality
-	/*$(document).on("click", "#update", function(){
-		var $airportNotes = $('#airport-notes');
-		// console.log($airportNotes.val());
-
-		var ref = new Firebase('https://airport-status.firebaseio.com/airports/');
-		console.log(ref.child(data.icao));
-		console.log(results.key());
-		$airportNotes.val('');
-	});*/
-
-
-	//console.log(airportsReference.key());
-
-
 });  // End (document).ready
 
 
@@ -149,17 +134,18 @@ function passAirportData(data){
 	var readyTemplate = template(airport);  // Pass data Obj to template
 	$('body').append(readyTemplate);  // Append DOM
 
-
-	if(airportsReference.child(airport.icao)){
-		airportsReference.child(airport.icao).update({
-			data: airport,
-		});
-	}
-	else{
+	// if(airportsReference.child(airport.icao)){
+		console.log('set: ' + airportsReference.child(airport.icao));
 		airportsReference.child(airport.icao).set({
 			data: airport,
 		});
-	}
+	/*}
+	else{
+		console.log('set: ' + airportsReference.child(airport.icao));
+		airportsReference.child(airport.icao).set({
+			data: airport,
+		});
+	}*/
 
 	$(document).on("click", "#update", function(){
 		var $airportNotes = $('#airport-notes');
