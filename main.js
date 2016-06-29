@@ -152,7 +152,7 @@ function passAirportData(data){
 		name: data.name,
 		city: data.city,
 		state: data.state,
-		notes: '',
+		//notes: '',
 	}
 
 	var readyTemplate = template(airport);  // Pass data Obj to template
@@ -163,7 +163,7 @@ function passAirportData(data){
 	console.log('set: ' + airportsReference.child(airport.icao));
 	var data = {};
 	data[airport.icao] = airportDB;  // Dynamically creates Key w/airport ID ~ data.KBUR = airportDB
-	airportsReference.update(data);
+	airportsReference.update(data);  // PUSH 
 
 
 
