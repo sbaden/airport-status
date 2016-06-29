@@ -93,7 +93,7 @@ $(document).ready(function(){
 		}
 		else{
 			$.ajax({
-				url: 'http://services.faa.gov/airport/status/' + $searchAirportId.val() + '?format=application/json',
+				url: 'https://services.faa.gov/airport/status/' + $searchAirportId.val() + '?format=application/json',
 				type: 'GET',
 				success: function(response){
 					passAirportData(response);
