@@ -1,19 +1,5 @@
-// ?? Should I have one reference to Firebase and pass to functions ??
-// ?? Should I have one reference to Handlebars and pass to functions ??
-// ?? Should the $.ajax just make API call and create airport OBJ ??
-// ?? Is there a better way to create the airport OBJ and the data OBJ ??
-
-// ?? The Firebase DB only needs to save airport data that doesn't change
-//		- Weather & status are the only things that update (kind of)
-//		- Airport notes are created by user - currently being overwritten
-//			w/each API call
-
-// ?? Create & Update Functionality currently within passAirportData() ??
-// ?? Clear page w/each button (submit & favorites)
-
 
 'use strict';  // Strict mode checks for undeclared variables (etc.?)
-
 
 $(document).ready(function(){
 
@@ -27,10 +13,6 @@ $(document).ready(function(){
 
 	firebase.initializeApp(config);
 
-	// Get a database reference to airports
-	var myDBReference = new Firebase('https://airport-status.firebaseio.com/')
-	//var airportsReference = myDBReference.child('airports');
-	//var airportNotesReference = myDBReference.child('notes');
 
 
 	// READ FUNCTIONALITY: Get saved airports from Firebase DB
@@ -39,7 +21,7 @@ $(document).ready(function(){
 
 	refNotes.orderByKey().on('child_added', function(notesResults){
 		console.log('Firebase Notes:',notesResults.val().notes);
-	})
+	});
 
 	ref.orderByKey().on("child_added", function(results) {
 		console.log('Firebase Airports Key:',results.key());
@@ -53,7 +35,7 @@ $(document).ready(function(){
 			notes: results.val().notes,
 			id: results.key(), // Gets the key of the location that generated the DataSnapshot "results"
 		}
-		//console.log(results.val().notes);
+
 		var templateSource = $('#airport-template').html();  // Reference html template
 		var template = Handlebars.compile(templateSource);  // Compile template w/Handlebars
 
@@ -66,25 +48,20 @@ $(document).ready(function(){
 		});
 
 		$('#get-saved-airports').on('click', function(){
-			// event.preventDefault();
 			console.log(data);	
 			$('#airport-list').append($templateHTML); // adds data to list dynamically
 		});
 
+		// DESTROY FUNCTIONALITY
 		$('#clear-data').on('click', function(){
 
 			var onComplete = function(error) {
-				if (error) {
-					console.log('Failed to clear data');
-				}
-				else {
-					console.log('favorites cleared successfully');
-				}
+				if (error) { console.log('Failed to clear data'); }
+				else { console.log('favorites cleared successfully'); }
 			};
 
 			ref.remove(onComplete);
 			refNotes.remove(onComplete);
-			// alert('favorites have been cleared');
 		});
 	});
 
@@ -115,7 +92,6 @@ $(document).ready(function(){
 		$searchAirportId.val('');
 
 	});  // End submitButton event listener/handler
-
 });  // End (document).ready
 
 
@@ -170,6 +146,7 @@ function passAirportData(data){
 
 	// CREATE FUNCTIONALITY: Push OBJ to Firebase DB
 	console.log('set: ' + airportsReference.child(airport.icao));
+
 	var data = {};
 	data[airport.icao] = airportDB;  // Dynamically creates Key w/airport ID ~ data.KBUR = airportDB
 
@@ -196,28 +173,18 @@ function passAirportData(data){
 
 
 function updateAirport(data) {
-	var helper = Handlebars.registerHelper('noop', function(options) {
-		return options.fn(this);
-	});
-	console.log(helper);
 	var $airportNotesInput = $('#airport-notes-input');
-	// console.log($airportNotesInput.val());
-
 	var id = data.icao;
-	// console.log(id);
-
 	var airportNotesIdRef = new Firebase('https://airport-status.firebaseio.com/notes/' + id);
-	// console.log($airportNotesInput.val());
 
 	airportNotesIdRef.update({
 		notes: $airportNotesInput.val(),
 	});
 
 	var notesOwnerRef = airportNotesIdRef.child('owner');
-
 	var idOBJ = {};
-	idOBJ[id] = true;  // Dynamically creates Key w/airport ID ~ data.KBUR = airportDB
 
+	idOBJ[id] = true;  // Dynamically creates Key w/airport ID ~ data.KBUR = airportDB
 	notesOwnerRef.update(idOBJ);
 
 	/*var notesOwnerRef = new Firebase('https://airport-status.firebaseio.com/notes/owner');

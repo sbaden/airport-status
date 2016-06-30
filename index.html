@@ -22,10 +22,9 @@
 				<input id="airport-search" type="text">
 				<button id="get-airport-data">Get Airport Status</button>
 			</form>
-			<!-- <form id="favorites-form"> -->
-				<button id="get-saved-airports">Favorites</button>
-				<button id="clear-data">Clear Favorites</button>
-			<!-- </form> -->
+
+			<button id="get-saved-airports">Favorites</button>
+			<button id="clear-data">Clear Favorites</button>
 		</div>
 
 		<script id="airport-template" type="text/x-handlebars-template">
@@ -53,7 +52,7 @@
 				<h2>Closure End: {{closureEnd}}</h2>
 				<h2>Trend: {{trend}}</h2>
 				<br>
-				<h2>Add Notes<input id="airport-notes-input" type="text">{{#noop}}{{airport-notes-input}}{{/noop}}</input><button id="update">Update</button></h2>
+				<h2>Add Notes<input id="airport-notes-input" type="text"></input><button id="update">Update</button></h2>
 				
 			</div>
 			<hr>
