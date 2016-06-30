@@ -5,10 +5,10 @@ $(document).ready(function(){
 
 	// FIREBASE: Set config & Initialize
 	var config = {
-		apiKey: "AIzaSyBbZHH2sVP6K3aZgR5xeQqz2PEw6RbLLTE",
-		authDomain: "airport-status.firebaseapp.com",
-		databaseURL: "https://airport-status.firebaseio.com",
-		storageBucket: "",
+		apiKey: 'AIzaSyBbZHH2sVP6K3aZgR5xeQqz2PEw6RbLLTE',
+		authDomain: 'airport-status.firebaseapp.com',
+		databaseURL: 'https://airport-status.firebaseio.com',
+		storageBucket: '',
 	};
 
 	firebase.initializeApp(config);
@@ -23,7 +23,7 @@ $(document).ready(function(){
 		console.log('Firebase Notes:',notesResults.val().notes);
 	});
 
-	ref.orderByKey().on("child_added", function(results) {  // get each airport from DB
+	ref.orderByKey().on('child_added', function(results) {  // get each airport from DB
 		console.log('Firebase Airports Key:',results.key());
 		console.log('Firebase Airports val:',results.val().name);
 
@@ -149,7 +149,7 @@ function passAirportData(data){
 	var data = {};
 	data[airport.icao] = airportDB;  // Dynamically creates Key w/airport ID ~ data.KBUR = airportDB
 
-	airportsReference.once("value", function(snapshot) {  // Gets picture of airports
+	airportsReference.once('value', function(snapshot) {  // Gets picture of airports
 		if(!snapshot.child(airport.icao).exists()){  // If specific airport !exist
 			airportsReference.update(data);  // Push new airport to Firebase DB
 			console.log('Create DB Entry: Airport');
@@ -166,7 +166,7 @@ function passAirportData(data){
 
 
 	////  UPDATE FUNCTIONALITY: Update Firebase DB with airport notes ////
-	$(document).on("click", "#update", function(){
+	$(document).on('click', '#update', function(){
 		updateAirport(airport);
 	});
 }
@@ -213,6 +213,42 @@ REMARKS:
 	* Two-way relationship:
 		- Set up two-way relationship between each airport instance and each notes instance
 		- Firebase:  https://www.firebase.com/docs/web/guide/structuring-data.html
+		- May have to switch to key rather than airport ID for this to work
+
+		{
+		    'airports': {
+				'KLAX': {
+					'name': 'Los Angeles Municipal Airport',
+					'notes': {  // index Mary's groups in her profile
+						'KLAX': true,  // value doesn't matter, just that the key exists
+					},
+				},
+		    },
+		    'notes': {
+				'KLAX': {
+					'note': 'Shoreline Route 2+mi Off Shore',
+					'owner': {
+						'KLAX': true,
+					},
+				},
+		    },
+		}
+
+*/
+
+
+/*
+Technical hurdles:
+	1) Create Firebase instance with airport ID instead of random Key
+	2) Create two-way relationships in Firebase
+	3) Create unique ID for handlebars template input field
+
+Learned:
+	1) How to dynamically create key name
+		var data = {};
+		data[airport.icao] = airportDB;
+
+	2) Data structure on Firebase
 
 */
 
