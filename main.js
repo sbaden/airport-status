@@ -3,7 +3,7 @@
 
 $(document).ready(function(){
 
-	// Initialize Firebase
+	// FIREBASE: Set config & Initialize
 	var config = {
 		apiKey: "AIzaSyBbZHH2sVP6K3aZgR5xeQqz2PEw6RbLLTE",
 		authDomain: "airport-status.firebaseapp.com",
@@ -15,53 +15,49 @@ $(document).ready(function(){
 
 
 
-	// READ FUNCTIONALITY: Get saved airports from Firebase DB
-	var ref = new Firebase('https://airport-status.firebaseio.com/airports/');
-	var refNotes = new Firebase('https://airport-status.firebaseio.com/notes/');
+	//// READ FUNCTIONALITY: Get saved airports from Firebase DB ////
+	var ref = new Firebase('https://airport-status.firebaseio.com/airports/');  // Ref airports endpoint
+	var refNotes = new Firebase('https://airport-status.firebaseio.com/notes/');  // Ref notes endpoint
 
-	refNotes.orderByKey().on('child_added', function(notesResults){
+	refNotes.orderByKey().on('child_added', function(notesResults){  // Get and log all notes
 		console.log('Firebase Notes:',notesResults.val().notes);
 	});
 
-	ref.orderByKey().on("child_added", function(results) {
+	ref.orderByKey().on("child_added", function(results) {  // get each airport from DB
 		console.log('Firebase Airports Key:',results.key());
 		console.log('Firebase Airports val:',results.val().name);
 
-		var data = {
+		var data = {  // Define OBJ for each airports data
 			icao: results.val().icao,
-			name: results.val().name, // API specific gives us our message, we know this b/c we logged it above
+			name: results.val().name,
 			city: results.val().city,
 			state: results.val().state,
 			notes: results.val().notes,
 			id: results.key(), // Gets the key of the location that generated the DataSnapshot "results"
 		}
 
+		// HANDLEBARS: Set template, compile & append DOM 
 		var templateSource = $('#airport-template').html();  // Reference html template
 		var template = Handlebars.compile(templateSource);  // Compile template w/Handlebars
-
 		var templateHTML = template(data); // render the data
 		var $templateHTML = $(templateHTML);
 
-		$templateHTML.click(function() {
-			var airportId = $(this).data('id');
-			// updateMessage(airportId);
-		});
-
 		$('#get-saved-airports').on('click', function(){
 			console.log(data);	
-			$('#airport-list').append($templateHTML); // adds data to list dynamically
+			$('#airport-list').append($templateHTML); // add data to template
 		});
 
-		// DESTROY FUNCTIONALITY
-		$('#clear-data').on('click', function(){
 
+
+		//// DESTROY FUNCTIONALITY ////
+		$('#clear-data').on('click', function(){
 			var onComplete = function(error) {
 				if (error) { console.log('Failed to clear data'); }
 				else { console.log('favorites cleared successfully'); }
 			};
 
-			ref.remove(onComplete);
-			refNotes.remove(onComplete);
+			ref.remove(onComplete);  // Destroy airports
+			refNotes.remove(onComplete);  // Destroy airport notes
 		});
 	});
 
@@ -71,13 +67,14 @@ $(document).ready(function(){
 	$('#airport-form').submit(function(event){
 		event.preventDefault();
 		console.log('submited');
+
 		var $searchAirportId = $('#airport-search');
 
-		if(!$searchAirportId.val().trim() || $searchAirportId.val().length > 3){
+		if(!$searchAirportId.val().trim() || $searchAirportId.val().length > 3){  // Checks for valid input
 			alert('Please enter a valid airport 3 letter identifier');
 		}
 		else{
-			$.ajax({
+			$.ajax({  // HTTPRequest - Get airport data from FAA
 				url: 'https://services.faa.gov/airport/status/' + $searchAirportId.val() + '?format=application/json',
 				type: 'GET',
 				success: function(response){
@@ -89,26 +86,27 @@ $(document).ready(function(){
 			});
 		}
 
-		$searchAirportId.val('');
+		$searchAirportId.val('');  // Reset/Clear search input (clean-up)
 
 	});  // End submitButton event listener/handler
 });  // End (document).ready
 
 
 
+
 function passAirportData(data){
 
-	///// Firebase
+	// FIREBASE: Set references
 	var myDBReference = new Firebase('https://airport-status.firebaseio.com/')
 	var airportsReference = myDBReference.child('airports');
 	var airportNotesReference = myDBReference.child('notes');
 
-	///// Handlebars
+	// HANDLEBARS: Set template & compile
 	var templateSource = $('#airport-template').html();  // Reference html template
 	var template = Handlebars.compile(templateSource);  // Compile template w/Handlebars
 
-	// Define OBJ to pass to template
-	var airport = {
+	
+	var airport = {  // Define OBJ to pass to template
 		icao: data.ICAO.toUpperCase(),
 		name: data.name,
 		city: data.city,
@@ -131,8 +129,8 @@ function passAirportData(data){
 			trend: data.status.trend,
 	} // end airport Obj
 
-	// Define OBJ to push to Firebase
-	var airportDB = {
+	
+	var airportDB = {  // Define OBJ to push to Firebase
 		icao: data.ICAO.toUpperCase(),
 		name: data.name,
 		city: data.city,
@@ -144,19 +142,21 @@ function passAirportData(data){
 	$('body').append(readyTemplate);  // Append DOM
 
 
-	// CREATE FUNCTIONALITY: Push OBJ to Firebase DB
+
+	//// CREATE FUNCTIONALITY: Push OBJ to Firebase DB ////
 	console.log('set: ' + airportsReference.child(airport.icao));
 
 	var data = {};
 	data[airport.icao] = airportDB;  // Dynamically creates Key w/airport ID ~ data.KBUR = airportDB
 
-	airportsReference.once("value", function(snapshot) {
-		if(!snapshot.child(airport.icao).exists()){
-			airportsReference.update(data);  // PUSH to Firebase DB
+	airportsReference.once("value", function(snapshot) {  // Gets picture of airports
+		if(!snapshot.child(airport.icao).exists()){  // If specific airport !exist
+			airportsReference.update(data);  // Push new airport to Firebase DB
 			console.log('Create DB Entry: Airport');
 
 			var relRef = airportsReference.child(airport.icao);
-			relRef.update({
+
+			relRef.update({  // *See Remarks: Two-way relationship
 				notes: true,
 			})
 			console.log('relRef:',relRef);
@@ -165,15 +165,17 @@ function passAirportData(data){
 
 
 
-	//  UPDATE FUNCTIONALITY: Update Firebase DB with airport notes
+	////  UPDATE FUNCTIONALITY: Update Firebase DB with airport notes ////
 	$(document).on("click", "#update", function(){
 		updateAirport(airport);
 	});
 }
 
 
+
+
 function updateAirport(data) {
-	var $airportNotesInput = $('#airport-notes-input');
+	var $airportNotesInput = $('#airport-notes-input');  // *See Remarks: Create airport note
 	var id = data.icao;
 	var airportNotesIdRef = new Firebase('https://airport-status.firebaseio.com/notes/' + id);
 
@@ -181,6 +183,8 @@ function updateAirport(data) {
 		notes: $airportNotesInput.val(),
 	});
 
+
+	// *See Remarks: two-way relationship
 	var notesOwnerRef = airportNotesIdRef.child('owner');
 	var idOBJ = {};
 
@@ -189,11 +193,28 @@ function updateAirport(data) {
 
 	/*var notesOwnerRef = new Firebase('https://airport-status.firebaseio.com/notes/owner');
 	notesOwnerRef.update({
-
 	})*/
+
+	// end *See Remarks: two-way relationship
+
+
 	$airportNotesInput.val('');
 }
 
+
+/*
+REMARKS:
+
+	* Create airport note:
+		- Each template instance needs unique ID for notes input
+		- Currently I have to reload the page between each airport search and note update
+		- handlebars.registerHelper()?
+
+	* Two-way relationship:
+		- Set up two-way relationship between each airport instance and each notes instance
+		- Firebase:  https://www.firebase.com/docs/web/guide/structuring-data.html
+
+*/
 
 
 
