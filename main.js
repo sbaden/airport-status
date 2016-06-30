@@ -65,10 +65,25 @@ $(document).ready(function(){
 			// updateMessage(airportId);
 		});
 
-		$('#favorites-form').submit(function(){
-			event.preventDefault();
+		$('#get-saved-airports').on('click', function(){
+			// event.preventDefault();
 			console.log(data);	
 			$('#airport-list').append($templateHTML); // adds data to list dynamically
+		});
+
+		$('#clear-data').on('click', function(){
+
+			var onComplete = function(error) {
+				if (error) {
+					console.log('Failed to clear data');
+				}
+				else {
+					console.log('favorites cleared successfully');
+				}
+			};
+
+			ref.remove(onComplete);
+			refNotes.remove(onComplete);
 		});
 	});
 
@@ -145,7 +160,7 @@ function passAirportData(data){
 		name: data.name,
 		city: data.city,
 		state: data.state,
-		notes: true,
+		// notes: true,
 	}
 
 	var readyTemplate = template(airport);  // Pass data Obj to template
@@ -162,11 +177,11 @@ function passAirportData(data){
 			airportsReference.update(data);  // PUSH to Firebase DB
 			console.log('Create DB Entry: Airport');
 
-			/*var relRef = airportsReference.child(airport.icao);
+			var relRef = airportsReference.child(airport.icao);
 			relRef.update({
 				notes: true,
 			})
-			console.log('relRef:',relRef);*/
+			console.log('relRef:',relRef);
 		}
 	});
 
@@ -190,12 +205,24 @@ function updateAirport(data) {
 	var id = data.icao;
 	// console.log(id);
 
-	var airportNotesRef = new Firebase('https://airport-status.firebaseio.com/notes/' + id);
+	var airportNotesIdRef = new Firebase('https://airport-status.firebaseio.com/notes/' + id);
 	// console.log($airportNotesInput.val());
 
-	airportNotesRef.update({
+	airportNotesIdRef.update({
 		notes: $airportNotesInput.val(),
 	});
+
+	var notesOwnerRef = airportNotesIdRef.child('owner');
+
+	var idOBJ = {};
+	idOBJ[id] = true;  // Dynamically creates Key w/airport ID ~ data.KBUR = airportDB
+
+	notesOwnerRef.update(idOBJ);
+
+	/*var notesOwnerRef = new Firebase('https://airport-status.firebaseio.com/notes/owner');
+	notesOwnerRef.update({
+
+	})*/
 	$airportNotesInput.val('');
 }
 
