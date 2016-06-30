@@ -84,7 +84,7 @@ $(document).ready(function(){
 
 			ref.remove(onComplete);
 			refNotes.remove(onComplete);
-			alert('favorites have been cleared');
+			// alert('favorites have been cleared');
 		});
 	});
 
