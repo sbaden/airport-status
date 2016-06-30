@@ -145,7 +145,7 @@ function passAirportData(data){
 		name: data.name,
 		city: data.city,
 		state: data.state,
-		// notes: '',
+		notes: true,
 	}
 
 	var readyTemplate = template(airport);  // Pass data Obj to template
@@ -161,7 +161,7 @@ function passAirportData(data){
 		if(!snapshot.child(airport.icao).exists()){
 			airportsReference.update(data);  // PUSH to Firebase DB
 			console.log('Create DB Entry: Airport');
-			
+
 			/*var relRef = airportsReference.child(airport.icao);
 			relRef.update({
 				notes: true,
