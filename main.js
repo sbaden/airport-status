@@ -29,14 +29,21 @@ $(document).ready(function(){
 
 	// Get a database reference to airports
 	var myDBReference = new Firebase('https://airport-status.firebaseio.com/')
-	var airportsReference = myDBReference.child('airports');
+	//var airportsReference = myDBReference.child('airports');
+	//var airportNotesReference = myDBReference.child('notes');
 
 
 	// READ FUNCTIONALITY: Get saved airports from Firebase DB
 	var ref = new Firebase('https://airport-status.firebaseio.com/airports/');
+	var refNotes = new Firebase('https://airport-status.firebaseio.com/notes/');
+
+	refNotes.orderByKey().on('child_added', function(notesResults){
+		console.log('Firebase Notes:',notesResults.val().notes);
+	})
+
 	ref.orderByKey().on("child_added", function(results) {
-		console.log(results.key());
-		console.log(results.val().name);
+		console.log('Firebase Airports Key:',results.key());
+		console.log('Firebase Airports val:',results.val().name);
 
 		var data = {
 			icao: results.val().icao,
@@ -44,24 +51,9 @@ $(document).ready(function(){
 			city: results.val().city,
 			state: results.val().state,
 			notes: results.val().notes,
-			/*weather: results.val().weather,
-				visibility: results.val().visibility,
-				temp: results.val().temp,
-				wind: results.val().wind,
-				updated: results.val().updated,
-			delay: results.val().delay,
-			status: results.val().status,
-				reason: results.val().reason,
-				avgDelay: results.val().avgDelay,
-				minDelay: results.val().minDelay,
-				maxDelay: results.val().maxDelay,
-				endTime: results.val().endTime,
-				closureBegin: results.val().closureBegin,
-				closureEnd: results.val().closureEnd,
-				trend: results.val().trend,*/
 			id: results.key(), // Gets the key of the location that generated the DataSnapshot "results"
 		}
-		console.log(results.val().notes);
+		//console.log(results.val().notes);
 		var templateSource = $('#airport-template').html();  // Reference html template
 		var template = Handlebars.compile(templateSource);  // Compile template w/Handlebars
 
@@ -117,6 +109,7 @@ function passAirportData(data){
 	///// Firebase
 	var myDBReference = new Firebase('https://airport-status.firebaseio.com/')
 	var airportsReference = myDBReference.child('airports');
+	var airportNotesReference = myDBReference.child('notes');
 
 	///// Handlebars
 	var templateSource = $('#airport-template').html();  // Reference html template
@@ -152,7 +145,7 @@ function passAirportData(data){
 		name: data.name,
 		city: data.city,
 		state: data.state,
-		//notes: '',
+		// notes: '',
 	}
 
 	var readyTemplate = template(airport);  // Pass data Obj to template
@@ -163,7 +156,19 @@ function passAirportData(data){
 	console.log('set: ' + airportsReference.child(airport.icao));
 	var data = {};
 	data[airport.icao] = airportDB;  // Dynamically creates Key w/airport ID ~ data.KBUR = airportDB
-	airportsReference.update(data);  // PUSH 
+
+	airportsReference.once("value", function(snapshot) {
+		if(!snapshot.child(airport.icao).exists()){
+			airportsReference.update(data);  // PUSH to Firebase DB
+			console.log('Create DB Entry: Airport');
+			
+			/*var relRef = airportsReference.child(airport.icao);
+			relRef.update({
+				notes: true,
+			})
+			console.log('relRef:',relRef);*/
+		}
+	});
 
 
 
@@ -175,21 +180,35 @@ function passAirportData(data){
 
 
 function updateAirport(data) {
-	var $airportNotes = $('#airport-notes');
-	// console.log($airportNotes.val());
+	var helper = Handlebars.registerHelper('noop', function(options) {
+		return options.fn(this);
+	});
+	console.log(helper);
+	var $airportNotesInput = $('#airport-notes-input');
+	// console.log($airportNotesInput.val());
 
 	var id = data.icao;
-	var airportRef = new Firebase('https://airport-status.firebaseio.com/airports/' + id);
+	// console.log(id);
 
-	console.log($airportNotes.val());
-	airportRef.update({
-		notes: $airportNotes.val(),
+	var airportNotesRef = new Firebase('https://airport-status.firebaseio.com/notes/' + id);
+	// console.log($airportNotesInput.val());
+
+	airportNotesRef.update({
+		notes: $airportNotesInput.val(),
 	});
-	$airportNotes.val('');
+	$airportNotesInput.val('');
 }
 
 
-// separate airport OBJ & weather OBJ
+
+
+
+
+
+
+
+
+
 
 
 
