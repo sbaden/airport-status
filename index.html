@@ -28,7 +28,7 @@
 		</div>
 
 		<script id="airport-template" type="text/x-handlebars-template">
-			<div id="airport-wrapper">
+			<div>
 				<h1>Airport: {{name}}</h1>
 				<h2>ICAO: {{icao}}</h2>
 				<h2>City: {{city}}</h2>
@@ -58,9 +58,14 @@
 			<hr>
 		</script>
 
-		<div id="data-wrapper">
-			<ol id="airport-list"></ol>
+		<div id="airport-wrapper">
+			<!-- Empty div for airport weather & status -->
 		</div>
+
+		<div id="data-wrapper">
+			<!-- Empty div for DB -->
+		</div>
+		
 	</body>
 </html>
 
